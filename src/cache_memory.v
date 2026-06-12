@@ -23,7 +23,13 @@ module cache_memory (
     //iesirile fsm ului
     output reg  [18:0] tag_out,        // tag-ul din way-ul sel
     output reg         valid_out,      // valid din way-ul sel
-    output reg         dirty_out       // dirty din way-ul sel
+    output reg         dirty_out,      // dirty din way-ul sel
+
+    // Citire paralela toate 4 way-uri (pentru hit detection in controller)
+    output wire [18:0]  tag_w0,   tag_w1,   tag_w2,   tag_w3,
+    output wire         valid_w0, valid_w1, valid_w2, valid_w3,
+    output wire         dirty_w0, dirty_w1, dirty_w2, dirty_w3,
+    output wire [511:0] data_w0,  data_w1,  data_w2,  data_w3
 );
 
     // memoria
@@ -35,7 +41,24 @@ module cache_memory (
 
     integer i, j;
 
-    /
+    // Assign-uri combinationale pentru citirea paralela a tuturor way-urilor
+    assign tag_w0   = tag  [set_index][0];
+    assign tag_w1   = tag  [set_index][1];
+    assign tag_w2   = tag  [set_index][2];
+    assign tag_w3   = tag  [set_index][3];
+    assign valid_w0 = valid[set_index][0];
+    assign valid_w1 = valid[set_index][1];
+    assign valid_w2 = valid[set_index][2];
+    assign valid_w3 = valid[set_index][3];
+    assign dirty_w0 = dirty[set_index][0];
+    assign dirty_w1 = dirty[set_index][1];
+    assign dirty_w2 = dirty[set_index][2];
+    assign dirty_w3 = dirty[set_index][3];
+    assign data_w0  = data [set_index][0];
+    assign data_w1  = data [set_index][1];
+    assign data_w2  = data [set_index][2];
+    assign data_w3  = data [set_index][3];
+
     // reset- totul devine invalid si nu dirty
     always @(posedge clk) begin
         if (rst) begin
